@@ -1,8 +1,8 @@
 import os
 import asyncio
 import time
-from aiogram import Bot, Dispatcher, types
-from aiogram.types import Message
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.filters import Command
 
 TOKEN = os.getenv("TOKEN")  # Токен бота
 ADMIN_ID = int(os.getenv("ADMIN_ID"))  # Твой Telegram ID (число)
@@ -22,7 +22,7 @@ user_messages = {}
 user_notified = set()
 
 @dp.message()
-async def handle_messages(message: Message):
+async def handle_messages(message: types.Message):
     """Пересылает сообщения админу и позволяет отвечать обратно"""
     user_id = message.from_user.id
 
@@ -66,8 +66,8 @@ async def handle_messages(message: Message):
             target_user = user_messages[message.reply_to_message.message_id]
             await bot.send_message(target_user, f"{message.text}")
 
-@dp.message(commands=['ban'])
-async def ban_user(message: Message):
+@dp.message(Command("ban"))
+async def ban_user(message: types.Message):
     """Команда для блокировки пользователя (только для админа)"""
     if message.from_user.id != ADMIN_ID:
         return
@@ -83,8 +83,8 @@ async def ban_user(message: Message):
     except (IndexError, ValueError):
         await message.answer("⚠️ Используйте команду так: `/ban user_id`")
 
-@dp.message(commands=['unban'])
-async def unban_user(message: Message):
+@dp.message(Command("unban"))
+async def unban_user(message: types.Message):
     """Разблокировка пользователя (только для админа)"""
     if message.from_user.id != ADMIN_ID:
         return
