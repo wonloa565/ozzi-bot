@@ -3,8 +3,8 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
 
-TOKEN = os.getenv("8064407397:AAFRHKy3qgElrQT8XrdU9ZkS1s5tFwPyaBg")  # Токен бота (Railway переменная)
-ADMIN_ID = os.getenv("7395692166")  # Твой Telegram ID
+TOKEN = os.getenv("TOKEN")  # Токен бота (Railway переменная)
+ADMIN_ID = os.getenv("ADMIN_ID")  # Твой Telegram ID
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
