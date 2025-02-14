@@ -1,19 +1,21 @@
 import os
 import asyncio
 import time
-from aiogram import Bot, Dispatcher, types, F
+from aiogram import Bot, Dispatcher, Router, types, F
 from aiogram.filters import Command
+from aiogram.enums import ParseMode
 
 TOKEN = os.getenv("TOKEN")  # Токен бота
-ADMIN_ID = int(os.getenv("ADMIN_ID"))  # Твой Telegram ID (число)
+ADMIN_ID = int(os.getenv("ADMIN_ID"))  # Telegram ID администратора
 
-bot = Bot(token=TOKEN)
+bot = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
 dp = Dispatcher()
+router = Router()
 
 # Хранение заблокированных пользователей
 banned_users = set()
 
-# Отслеживание количества сообщений (для авто-блокировки)
+# Отслеживание количества сообщений (антиспам)
 user_spam_count = {}
 user_last_message_time = {}
 
@@ -21,7 +23,8 @@ user_last_message_time = {}
 user_messages = {}
 user_notified = set()
 
-@dp.message()
+
+@router.message()
 async def handle_messages(message: types.Message):
     """Пересылает сообщения админу и позволяет отвечать обратно"""
     user_id = message.from_user.id
@@ -66,7 +69,8 @@ async def handle_messages(message: types.Message):
             target_user = user_messages[message.reply_to_message.message_id]
             await bot.send_message(target_user, f"{message.text}")
 
-@dp.message(Command("ban"))
+
+@router.message(Command("ban"))
 async def ban_user(message: types.Message):
     """Команда для блокировки пользователя (только для админа)"""
     if message.from_user.id != ADMIN_ID:
@@ -83,7 +87,8 @@ async def ban_user(message: types.Message):
     except (IndexError, ValueError):
         await message.answer("⚠️ Используйте команду так: `/ban user_id`")
 
-@dp.message(Command("unban"))
+
+@router.message(Command("unban"))
 async def unban_user(message: types.Message):
     """Разблокировка пользователя (только для админа)"""
     if message.from_user.id != ADMIN_ID:
@@ -99,10 +104,13 @@ async def unban_user(message: types.Message):
     except (IndexError, ValueError):
         await message.answer("⚠️ Используйте команду так: `/unban user_id`")
 
+
 async def main():
     """Запуск бота"""
+    dp.include_router(router)  # Регистрация роутеров
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
