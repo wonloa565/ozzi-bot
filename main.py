@@ -74,35 +74,47 @@ async def handle_messages(message: types.Message):
 async def ban_user(message: types.Message):
     """Команда для блокировки пользователя (только для админа)"""
     if message.from_user.id != ADMIN_ID:
+        await message.answer("❌ У вас нет прав на выполнение этой команды.")
+        return
+
+    args = message.text.split()
+    if len(args) < 2:
+        await message.answer("⚠️ Используйте команду так: `/ban user_id`")
         return
 
     try:
-        user_id = int(message.text.split()[1])
+        user_id = int(args[1])
         if user_id in banned_users:
             await message.answer(f"⚠️ Пользователь {user_id} уже в бане.")
         else:
             banned_users.add(user_id)
             await message.answer(f"✅ Пользователь {user_id} заблокирован.")
             await bot.send_message(user_id, "Вы были заблокированы администратором.")
-    except (IndexError, ValueError):
-        await message.answer("⚠️ Используйте команду так: `/ban user_id`")
+    except ValueError:
+        await message.answer("⚠️ ID пользователя должен быть числом.")
 
 
 @router.message(Command("unban"))
 async def unban_user(message: types.Message):
     """Разблокировка пользователя (только для админа)"""
     if message.from_user.id != ADMIN_ID:
+        await message.answer("❌ У вас нет прав на выполнение этой команды.")
+        return
+
+    args = message.text.split()
+    if len(args) < 2:
+        await message.answer("⚠️ Используйте команду так: `/unban user_id`")
         return
 
     try:
-        user_id = int(message.text.split()[1])
+        user_id = int(args[1])
         if user_id in banned_users:
             banned_users.remove(user_id)
             await message.answer(f"✅ Пользователь {user_id} разблокирован.")
         else:
             await message.answer(f"⚠️ Пользователь {user_id} не был в бане.")
-    except (IndexError, ValueError):
-        await message.answer("⚠️ Используйте команду так: `/unban user_id`")
+    except ValueError:
+        await message.answer("⚠️ ID пользователя должен быть числом.")
 
 
 async def main():
